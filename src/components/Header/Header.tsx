@@ -32,7 +32,7 @@ export default function Header() {
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       <div className={`container ${styles.headerContainer}`}>
         <Link href="/" className={styles.logo}>
-          <Image src="/logo.png" alt="Lentone Logo" width={48} height={48} priority style={{ objectFit: "contain" }} />
+          <Image src="/logo.png" alt="Lentone Logo" width={48} height={48} priority style={{ objectFit: "contain", width: "auto" }} />
         </Link>
 
         <nav className={styles.nav}>

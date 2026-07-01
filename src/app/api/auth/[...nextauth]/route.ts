@@ -29,7 +29,8 @@ const handler = NextAuth({
   },
   session: {
     strategy: "jwt",
-  }
+  },
+  secret: process.env.NEXTAUTH_SECRET || "fallback_secret_for_development_only_123456789",
 });
 
 export { handler as GET, handler as POST };
