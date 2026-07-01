@@ -20,11 +20,25 @@ const staggerContainer: Variants = {
 
 export default function Home() {
   const [bgIndex, setBgIndex] = useState(0);
+  const [content, setContent] = useState<Record<string, string>>({});
   
   const heroImages = [
-    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=2000",
+    content.hero_image || "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=2000",
     "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=2000"
   ];
+
+  useEffect(() => {
+    fetch("/api/content?page=home")
+      .then(res => res.json())
+      .then(data => {
+        const contentMap: Record<string, string> = {};
+        data.forEach((item: any) => {
+          contentMap[item.section] = item.content;
+        });
+        setContent(contentMap);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,8 +68,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, ease: "easeOut" }}
             >
-              Formulating <br/>
-              <span className={styles.titleHighlight}>Excellence.</span>
+              {content.hero_title || "Formulating Excellence."}
             </motion.h1>
             <motion.p 
               className={styles.heroSubtitle}
@@ -63,7 +76,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 1 }}
             >
-              Premium hospitality amenities and commercial cleaning solutions crafted for industry leaders. Direct from our manufacturing facility to your establishment.
+              {content.hero_subtitle || "Premium hospitality amenities and commercial cleaning solutions crafted for industry leaders. Direct from our manufacturing facility to your establishment."}
             </motion.p>
             <motion.div 
               className={styles.heroBtns}
