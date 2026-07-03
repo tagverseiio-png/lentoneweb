@@ -19,6 +19,35 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+import { unstable_cache } from "next/cache";
+
+const getCachedGlobalTabTitle = unstable_cache(
+  async () => {
+    const titleSnap = await getDoc(doc(db, "pageContent", "global_tab_title"));
+    return titleSnap.exists() ? titleSnap.data() : null;
+  },
+  ["global_tab_title"],
+  { revalidate: 3600, tags: ["content"] }
+);
+
+const getCachedGlobalFavicon = unstable_cache(
+  async () => {
+    const faviconSnap = await getDoc(doc(db, "pageContent", "global_favicon"));
+    return faviconSnap.exists() ? faviconSnap.data() : null;
+  },
+  ["global_favicon"],
+  { revalidate: 3600, tags: ["content"] }
+);
+
+const getCachedSEOHome = unstable_cache(
+  async () => {
+    const seoSnap = await getDoc(doc(db, "seo", "home"));
+    return seoSnap.exists() ? seoSnap.data() : null;
+  },
+  ["seo_home"],
+  { revalidate: 3600, tags: ["seo"] }
+);
+
 export async function generateMetadata(): Promise<Metadata> {
   let title = "LENTONE | Premium Hospitality & Cleaning Solutions";
   let favicon = "/favicon.ico";
@@ -26,21 +55,21 @@ export async function generateMetadata(): Promise<Metadata> {
   let keywords = "";
 
   try {
-    const titleSnap = await getDoc(doc(db, "pageContent", "global_tab_title"));
-    if (titleSnap.exists()) {
-      title = titleSnap.data().content || title;
+    const titleData = await getCachedGlobalTabTitle();
+    if (titleData) {
+      title = titleData.content || title;
     } else {
-      const seoSnap = await getDoc(doc(db, "seo", "home"));
-      if (seoSnap.exists()) {
-        title = seoSnap.data().title || title;
-        description = seoSnap.data().description || description;
-        keywords = seoSnap.data().keywords || keywords;
+      const seoData = await getCachedSEOHome();
+      if (seoData) {
+        title = seoData.title || title;
+        description = seoData.description || description;
+        keywords = seoData.keywords || keywords;
       }
     }
 
-    const faviconSnap = await getDoc(doc(db, "pageContent", "global_favicon"));
-    if (faviconSnap.exists() && faviconSnap.data().content) {
-      favicon = faviconSnap.data().content;
+    const faviconData = await getCachedGlobalFavicon();
+    if (faviconData && faviconData.content) {
+      favicon = faviconData.content;
     }
   } catch (error) {
     console.error("Error generating layout metadata:", error);

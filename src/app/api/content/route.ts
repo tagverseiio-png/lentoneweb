@@ -2,16 +2,29 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth/next";
+import { unstable_cache, revalidateTag } from "next/cache";
 
-export async function GET(req: Request) {
-  try {
+const getCachedContent = unstable_cache(
+  async () => {
     const colRef = collection(db, "pageContent");
     const snapshot = await getDocs(colRef);
-    const content = snapshot.docs.map(doc => ({
+    return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
-    return NextResponse.json(content);
+  },
+  ["page-content-list"],
+  { revalidate: 3600, tags: ["content"] }
+);
+
+export async function GET(req: Request) {
+  try {
+    const content = await getCachedContent();
+    return NextResponse.json(content, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600"
+      }
+    });
   } catch (error) {
     console.error("Fetch content error:", error);
     return NextResponse.json({ error: "Failed to fetch content" }, { status: 500 });
@@ -44,6 +57,9 @@ export async function PUT(req: Request) {
 
     await setDoc(docRef, updatedData, { merge: true });
 
+    // Invalidate content cache
+    revalidateTag("content", "max");
+
     return NextResponse.json({ id: docId, ...updatedData });
   } catch (error) {
     console.error("Update content error:", error);
@@ -65,6 +81,10 @@ export async function DELETE(req: Request) {
     }
 
     await deleteDoc(doc(db, "pageContent", id));
+
+    // Invalidate content cache
+    revalidateTag("content", "max");
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete content error:", error);

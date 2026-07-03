@@ -2,16 +2,29 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth/next";
+import { unstable_cache, revalidateTag } from "next/cache";
 
-export async function GET() {
-  try {
+const getCachedProducts = unstable_cache(
+  async () => {
     const colRef = collection(db, "products");
     const snapshot = await getDocs(colRef);
-    const products = snapshot.docs.map(doc => ({
+    return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
-    return NextResponse.json(products);
+  },
+  ["products-list"],
+  { revalidate: 3600, tags: ["products"] }
+);
+
+export async function GET() {
+  try {
+    const products = await getCachedProducts();
+    return NextResponse.json(products, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600"
+      }
+    });
   } catch (error: any) {
     console.error("Fetch products error:", error);
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
@@ -53,6 +66,9 @@ export async function POST(req: Request) {
 
     const docRef = doc(db, "products", docId);
     await setDoc(docRef, productData);
+
+    // Invalidate products cache
+    revalidateTag("products", "max");
 
     return NextResponse.json(productData);
   } catch (error: any) {
@@ -103,6 +119,10 @@ export async function PUT(req: Request) {
     updatedData.updatedAt = new Date().toISOString();
 
     await updateDoc(docRef, updatedData);
+    
+    // Invalidate products cache
+    revalidateTag("products", "max");
+
     return NextResponse.json({ success: true, id });
   } catch (error) {
     console.error("Update product error:", error);
@@ -121,6 +141,10 @@ export async function DELETE(req: Request) {
 
     const docRef = doc(db, "products", id);
     await deleteDoc(docRef);
+    
+    // Invalidate products cache
+    revalidateTag("products", "max");
+
     return NextResponse.json({ success: true, id });
   } catch (error) {
     console.error("Delete product error:", error);
