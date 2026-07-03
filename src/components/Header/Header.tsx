@@ -11,6 +11,7 @@ import styles from "./Header.module.css";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoSrc, setLogoSrc] = useState("/logo.png");
   const pathname = usePathname();
 
   useEffect(() => {
@@ -19,6 +20,20 @@ export default function Header() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/content?page=global")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const logoItem = data.find((item: any) => item.section === "logo");
+          if (logoItem && logoItem.content) {
+            setLogoSrc(logoItem.content);
+          }
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const navLinks = [
@@ -32,7 +47,7 @@ export default function Header() {
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       <div className={`container ${styles.headerContainer}`}>
         <Link href="/" className={styles.logo}>
-          <Image src="/logo.png" alt="Lentone Logo" width={48} height={48} priority style={{ objectFit: "contain", width: "auto" }} />
+          <img src={logoSrc} alt="Lentone Logo" style={{ objectFit: "contain", width: "auto", height: "48px" }} />
         </Link>
 
         <nav className={styles.nav}>

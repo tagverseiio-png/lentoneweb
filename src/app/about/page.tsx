@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Beaker, CheckCircle, Factory, MapPin, Building2 } from "lucide-react";
 import styles from "./page.module.css";
@@ -11,6 +12,23 @@ const fadeUp = {
 };
 
 export default function About() {
+  const [content, setContent] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/content?page=about")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const contentMap: Record<string, string> = {};
+          data.forEach((item: any) => {
+            contentMap[item.section] = item.content;
+          });
+          setContent(contentMap);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <>
       <section className={styles.aboutHero}>
@@ -20,14 +38,14 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            About Lentone
+            {content.about_title || "About Lentone"}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            Manufacturing Excellence. Delivered with Trust. We are dedicated to providing premium-quality cleaning solutions meeting international expectations.
+            {content.about_subtitle || "Manufacturing Excellence. Delivered with Trust. We are dedicated to providing premium-quality cleaning solutions meeting international expectations."}
           </motion.p>
         </div>
       </section>
@@ -42,12 +60,12 @@ export default function About() {
               viewport={{ once: true }}
               variants={fadeUp}
             >
-              <h2>Welcome to Lentone</h2>
+              <h2>{content.welcome_title || "Welcome to Lentone"}</h2>
               <p>
-                Lentone is a premier Indian manufacturer specializing in high-quality cleaning solutions and hospitality amenities. We cater directly to Hotels, Restaurants, Resorts, Corporate Offices, Educational Institutions, Hospitals, and Retail Businesses without any middlemen.
+                {content.welcome_text || "Lentone is a premier Indian manufacturer specializing in high-quality cleaning solutions and hospitality amenities. We cater directly to Hotels, Restaurants, Resorts, Corporate Offices, Educational Institutions, Hospitals, and Retail Businesses without any middlemen."}
               </p>
               <p>
-                Our mission is simple: to deliver premium-quality products that meet and exceed international expectations while remaining affordable, reliable, and strictly customer-focused. By controlling the entire manufacturing process, we ensure consistent excellence in every drop.
+                {content.mission_text || "Our mission is simple: to deliver premium-quality products that meet and exceed international expectations while remaining affordable, reliable, and strictly customer-focused. By controlling the entire manufacturing process, we ensure consistent excellence in every drop."}
               </p>
               <div style={{ marginTop: '30px' }}>
                 <Link href="/contact" className="btn-primary">Partner With Us</Link>
@@ -113,7 +131,7 @@ export default function About() {
             >
               <Building2 size={40} className="text-gold" />
               <h3>Head Office</h3>
-              <p>Chennai, Tamil Nadu</p>
+              <p>{content.presence_head_office || "Chennai, Tamil Nadu"}</p>
             </motion.div>
             <motion.div 
               className={styles.locationCard}
@@ -124,7 +142,7 @@ export default function About() {
             >
               <MapPin size={40} className="text-gold" />
               <h3>Branch Office</h3>
-              <p>Kannur, Kerala</p>
+              <p>{content.presence_branch_office || "Kannur, Kerala"}</p>
             </motion.div>
           </div>
         </div>

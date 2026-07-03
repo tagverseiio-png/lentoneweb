@@ -21,6 +21,9 @@ export default async function AdminLayout({
             <Link href="/admin">Dashboard</Link>
             <Link href="/admin/content">Page Content</Link>
             <Link href="/admin/products">Products</Link>
+            <Link href="/admin/seo">SEO Settings</Link>
+            <Link href="/admin/enquiries">Enquiries</Link>
+            <Link href="/admin/settings">Settings</Link>
             <Link href="/api/auth/signout" className={styles.logoutBtn}>Logout</Link>
           </nav>
         </aside>

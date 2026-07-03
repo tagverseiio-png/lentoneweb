@@ -1,5 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const handler = NextAuth({
   providers: [
@@ -10,15 +12,31 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        // Admin credentials for Lentone
-        const adminUsername = process.env.ADMIN_USERNAME || "admin";
-        const adminPassword = process.env.ADMIN_PASSWORD || "lentone2026";
+        try {
+          const docRef = doc(db, "admin", "credentials");
+          let docSnap = await getDoc(docRef);
+          
+          if (!docSnap.exists()) {
+            // Seed default credentials on first launch
+            const defaultCreds = {
+              username: "admin",
+              password: "lentone2026",
+              updatedAt: new Date().toISOString()
+            };
+            await setDoc(docRef, defaultCreds);
+            docSnap = await getDoc(docRef);
+          }
 
-        if (
-          credentials?.username === adminUsername &&
-          credentials?.password === adminPassword
-        ) {
-          return { id: "1", name: "Admin" };
+          const adminData = docSnap.data();
+
+          if (
+            credentials?.username === adminData?.username &&
+            credentials?.password === adminData?.password
+          ) {
+            return { id: "1", name: "Admin" };
+          }
+        } catch (error) {
+          console.error("Auth Firestore error:", error);
         }
         return null;
       }
@@ -34,3 +52,4 @@ const handler = NextAuth({
 });
 
 export { handler as GET, handler as POST };
+

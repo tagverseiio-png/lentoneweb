@@ -1,12 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import styles from "./page.module.css";
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [content, setContent] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/content?page=faq")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const contentMap: Record<string, string> = {};
+          data.forEach((item: any) => {
+            contentMap[item.section] = item.content;
+          });
+          setContent(contentMap);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const toggleFaq = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -48,14 +64,14 @@ export default function FAQPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            Frequently Asked Questions
+            {content.faq_title || "Frequently Asked Questions"}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            Find answers to common questions about our products, bulk ordering, and distribution network.
+            {content.faq_subtitle || "Find answers to common questions about our products, bulk ordering, and distribution network."}
           </motion.p>
         </div>
       </section>

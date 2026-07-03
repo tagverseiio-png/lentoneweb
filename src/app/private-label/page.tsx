@@ -1,16 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FlaskConical, PenTool, CheckCircle, Package, Truck, Target } from "lucide-react";
 import styles from "../forms.module.css";
 
 export default function PrivateLabelPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [content, setContent] = useState<Record<string, string>>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetch("/api/content?page=private-label")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const contentMap: Record<string, string> = {};
+          data.forEach((item: any) => {
+            contentMap[item.section] = item.content;
+          });
+          setContent(contentMap);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+    const company = formData.get("company") as string;
+    const category = formData.get("category") as string;
+    const projectDetails = formData.get("projectDetails") as string;
+
+    try {
+      const res = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "private-label",
+          name,
+          email,
+          phone,
+          details: { company, category, projectDetails }
+        })
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        alert("OEM enquiry submission failed.");
+      }
+    } catch {
+      alert("Error submitting enquiry.");
+    }
   };
 
   const processSteps = [
@@ -31,14 +74,14 @@ export default function PrivateLabelPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            Private Label & OEM Manufacturing
+            {content.pl_title || "Private Label & OEM Manufacturing"}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            Launch your own brand of premium cleaning solutions. We handle the manufacturing, you handle the selling.
+            {content.pl_subtitle || "Launch your own brand of premium cleaning solutions. We handle the manufacturing, you handle the selling."}
           </motion.p>
         </div>
       </section>
@@ -102,28 +145,28 @@ export default function PrivateLabelPage() {
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Name *</label>
-                    <input type="text" className={styles.input} required placeholder="Your full name" />
+                    <input name="name" type="text" className={styles.input} required placeholder="Your full name" />
                   </div>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Company Name *</label>
-                    <input type="text" className={styles.input} required placeholder="Your business name" />
+                    <input name="company" type="text" className={styles.input} required placeholder="Your business name" />
                   </div>
                 </div>
 
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Email *</label>
-                    <input type="email" className={styles.input} required placeholder="Your email address" />
+                    <input name="email" type="email" className={styles.input} required placeholder="Your email address" />
                   </div>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Phone Number *</label>
-                    <input type="tel" className={styles.input} required placeholder="Your contact number" />
+                    <input name="phone" type="tel" className={styles.input} required placeholder="Your contact number" />
                   </div>
                 </div>
 
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Product Categories Required *</label>
-                  <select className={styles.select} required>
+                  <select name="category" className={styles.select} required>
                     <option value="">-- Select Category --</option>
                     <option>Housekeeping & Floor Cleaners</option>
                     <option>Kitchen & Dishwashing</option>
@@ -135,7 +178,7 @@ export default function PrivateLabelPage() {
 
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Project Details</label>
-                  <textarea className={styles.textarea} placeholder="Tell us about your brand vision, custom formulation needs, or packaging ideas..."></textarea>
+                  <textarea name="projectDetails" className={styles.textarea} placeholder="Tell us about your brand vision, custom formulation needs, or packaging ideas..."></textarea>
                 </div>
 
                 <button type="submit" className={styles.submitBtn}>Submit OEM Request</button>

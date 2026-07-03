@@ -1,9 +1,27 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Mail, Phone, MapPin } from "lucide-react";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
+  const [logoSrc, setLogoSrc] = useState("/logo.png");
+
+  useEffect(() => {
+    fetch("/api/content?page=global")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const logoItem = data.find((item: any) => item.section === "logo");
+          if (logoItem && logoItem.content) {
+            setLogoSrc(logoItem.content);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.footerContainer}`}>
@@ -11,7 +29,7 @@ export default function Footer() {
         {/* About Section */}
         <div className={styles.footerCol}>
           <Link href="/" className={styles.footerLogo}>
-            <Image src="/logo.png" alt="Lentone Logo" width={64} height={64} style={{ objectFit: "contain" }} />
+            <img src={logoSrc} alt="Lentone Logo" style={{ objectFit: "contain", height: "64px", width: "auto" }} />
           </Link>
           <p className={styles.footerDesc}>
             Indian manufacturer of premium-quality hospitality amenities and cleaning solutions serving hotels, restaurants, offices, and commercial businesses.

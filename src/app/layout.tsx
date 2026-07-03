@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import WhatsAppCTA from "@/components/WhatsAppCTA/WhatsAppCTA";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -17,10 +19,43 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "LENTONE | Premium Hospitality & Cleaning Solutions",
-  description: "Indian manufacturer of premium-quality hospitality amenities and cleaning solutions serving hotels, restaurants, offices, and commercial businesses.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  let title = "LENTONE | Premium Hospitality & Cleaning Solutions";
+  let favicon = "/favicon.ico";
+  let description = "Indian manufacturer of premium-quality hospitality amenities and cleaning solutions serving hotels, restaurants, offices, and commercial businesses.";
+  let keywords = "";
+
+  try {
+    const titleSnap = await getDoc(doc(db, "pageContent", "global_tab_title"));
+    if (titleSnap.exists()) {
+      title = titleSnap.data().content || title;
+    } else {
+      const seoSnap = await getDoc(doc(db, "seo", "home"));
+      if (seoSnap.exists()) {
+        title = seoSnap.data().title || title;
+        description = seoSnap.data().description || description;
+        keywords = seoSnap.data().keywords || keywords;
+      }
+    }
+
+    const faviconSnap = await getDoc(doc(db, "pageContent", "global_favicon"));
+    if (faviconSnap.exists() && faviconSnap.data().content) {
+      favicon = faviconSnap.data().content;
+    }
+  } catch (error) {
+    console.error("Error generating layout metadata:", error);
+  }
+
+  return {
+    title,
+    description,
+    keywords,
+    icons: {
+      icon: favicon,
+    }
+  };
+}
+
 
 export default function RootLayout({
   children,

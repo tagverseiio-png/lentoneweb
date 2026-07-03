@@ -2,15 +2,52 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { productsData } from "@/data/products";
+import { useState, useEffect } from "react";
 import styles from "../page.module.css";
 import { motion } from "framer-motion";
+
+type Product = {
+  id: string;
+  name: string;
+  shortDesc: string;
+  fullDesc: string;
+  image: string;
+  features: string[];
+  packSizes: string[];
+  usage: string;
+  specs: Record<string, string>;
+};
 
 export default function ProductDetail() {
   const params = useParams();
   const { id } = params;
   
-  const product = productsData.find((p) => p.id === id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    fetch(`/api/products/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        setProduct(data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="container" style={{ padding: "120px 0", textAlign: "center" }}>
+        <p>Loading product details...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -49,11 +86,13 @@ export default function ProductDetail() {
             <p className={styles.tagline}>{product.shortDesc}</p>
             <p className={styles.description}>{product.fullDesc}</p>
             
-            <ul className={styles.featuresList}>
-              {product.features.map((feat, idx) => (
-                <li key={idx}>{feat}</li>
-              ))}
-            </ul>
+            {product.features && product.features.length > 0 && (
+              <ul className={styles.featuresList}>
+                {product.features.map((feat, idx) => (
+                  <li key={idx}>{feat}</li>
+                ))}
+              </ul>
+            )}
             
             <div className={styles.actionBtns}>
               <Link href="/contact" className="btn-primary">Request a Quote</Link>
@@ -63,15 +102,19 @@ export default function ProductDetail() {
             </div>
             
             <div className={styles.specsGrid}>
-              <div className={styles.specItem}>
-                <strong>Pack Sizes Available</strong>
-                <span>{product.packSizes.join(", ")}</span>
-              </div>
-              <div className={styles.specItem}>
-                <strong>Usage</strong>
-                <span>{product.usage}</span>
-              </div>
-              {Object.entries(product.specs).map(([key, val]) => (
+              {product.packSizes && product.packSizes.length > 0 && (
+                <div className={styles.specItem}>
+                  <strong>Pack Sizes Available</strong>
+                  <span>{product.packSizes.join(", ")}</span>
+                </div>
+              )}
+              {product.usage && (
+                <div className={styles.specItem}>
+                  <strong>Usage</strong>
+                  <span>{product.usage}</span>
+                </div>
+              )}
+              {product.specs && Object.entries(product.specs).map(([key, val]) => (
                 <div className={styles.specItem} key={key}>
                   <strong>{key}</strong>
                   <span>{val}</span>
@@ -84,3 +127,4 @@ export default function ProductDetail() {
     </section>
   );
 }
+
