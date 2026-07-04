@@ -19,14 +19,8 @@ const staggerContainer: Variants = {
 };
 
 export default function Home() {
-  const [bgIndex, setBgIndex] = useState(0);
   const [content, setContent] = useState<Record<string, string>>({});
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
-  
-  const heroImages = [
-    content.hero_image || "/backup_images/luxury-floor-cleaner.png",
-    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000"
-  ];
 
   useEffect(() => {
     // Fetch content
@@ -52,24 +46,18 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % heroImages.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [heroImages.length]);
-
   return (
     <>
       {/* Editorial Hero */}
       <section className={styles.hero}>
         <div className={styles.heroImageContainer}>
-          <img 
-            src={heroImages[bgIndex]} 
-            alt="Luxury Hospitality" 
-            className={styles.heroImage} 
-            key={bgIndex}
-          />
+          {content.hero_image && (
+            <img 
+              src={content.hero_image} 
+              alt="Luxury Hospitality" 
+              className={styles.heroImage} 
+            />
+          )}
         </div>
 
         <div className={styles.heroTextContainer}>
@@ -104,10 +92,14 @@ export default function Home() {
 
       {/* Split Pane: Why Choose Us */}
       <section className={styles.splitSection}>
-        <div 
-          className={styles.splitImage} 
-          style={{ backgroundImage: `url(${content.why_choose_image || 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=2000'})` }} 
-        />
+        {content.why_choose_image ? (
+          <div 
+            className={styles.splitImage} 
+            style={{ backgroundImage: `url(${content.why_choose_image})` }} 
+          />
+        ) : (
+          <div className={styles.splitImage} style={{ backgroundColor: "var(--navy-light)" }} />
+        )}
         <div className={styles.splitContent}>
           <div className={styles.sectionHeader}>
             <p>{content.split_title || "The Lentone Standard"}</p>
@@ -200,27 +192,19 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
           >
-            {(() => {
-              const defaultFeatured = [
-                { id: "luxury-floor-cleaner", name: "Luxury Floor Cleaner", shortDesc: "Long Lasting Freshness", image: "/backup_images/luxury-floor-cleaner.png" },
-                { id: "premium-hand-wash", name: "Premium Hand Wash", shortDesc: "Moisturizing Formula", image: "https://images.unsplash.com/photo-1608248597481-496100c8c836?auto=format&fit=crop&w=800&q=80" },
-                { id: "dishwash-gel", name: "Dishwash Gel", shortDesc: "Commercial Grade degreaser", image: "https://images.unsplash.com/photo-1607006342411-b0135a07292c?auto=format&fit=crop&w=800&q=80" }
-              ];
-              const displayProducts = featuredProducts.length > 0 ? featuredProducts : defaultFeatured;
-              return displayProducts.map((prod) => (
-                <motion.div className={styles.galleryItem} key={prod.id} variants={fadeUp}>
-                  <Link href={`/products/${prod.id}`}>
-                    <div className={styles.galleryImageWrapper}>
-                      <img src={prod.image || prod.img} alt={prod.name || prod.title} className={styles.galleryImage} />
-                    </div>
-                    <div className={styles.galleryInfo}>
-                      <h3>{prod.name || prod.title}</h3>
-                      <p>{prod.shortDesc || prod.desc}</p>
-                    </div>
-                  </Link>
-                </motion.div>
-              ));
-            })()}
+            {featuredProducts.map((prod) => (
+              <motion.div className={styles.galleryItem} key={prod.id} variants={fadeUp}>
+                <Link href={`/products/${prod.id}`}>
+                  <div className={styles.galleryImageWrapper}>
+                    {prod.image && <img src={prod.image} alt={prod.name || prod.title} className={styles.galleryImage} />}
+                  </div>
+                  <div className={styles.galleryInfo}>
+                    <h3>{prod.name || prod.title}</h3>
+                    <p>{prod.shortDesc || prod.desc}</p>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
           </motion.div>
           
           <div style={{ textAlign: 'center', marginTop: '80px' }}>
@@ -244,7 +228,9 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeUp}
           >
-            <img src={content.process_step_01_image || "https://images.unsplash.com/photo-1574689211272-bc1550ce1856?auto=format&fit=crop&w=1000&q=80"} alt="R&D Lab" className={styles.staggeredImage} />
+            {content.process_step_01_image && (
+              <img src={content.process_step_01_image} alt="R&D Lab" className={styles.staggeredImage} />
+            )}
             <div className={styles.staggeredContent}>
               <span className={styles.stepLabel}>Step 01</span>
               <h3>{content.process_step_01_title || "Research & Formulation"}</h3>
@@ -259,7 +245,9 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeUp}
           >
-            <img src={content.process_step_02_image || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80"} alt="Production Line" className={styles.staggeredImage} />
+            {content.process_step_02_image && (
+              <img src={content.process_step_02_image} alt="Production Line" className={styles.staggeredImage} />
+            )}
             <div className={styles.staggeredContent}>
               <span className={styles.stepLabel}>Step 02</span>
               <h3>{content.process_step_02_title || "Automated Production"}</h3>

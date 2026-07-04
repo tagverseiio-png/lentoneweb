@@ -5,10 +5,25 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { unstable_cache, revalidateTag } from "next/cache";
 
+import { defaultPageContent } from "@/data/defaultPageContent";
+
 const getCachedContent = unstable_cache(
   async () => {
     const colRef = collection(db, "pageContent");
     const snapshot = await getDocs(colRef);
+
+    if (snapshot.empty) {
+      for (const item of defaultPageContent) {
+        const docRef = doc(db, "pageContent", item.id);
+        await setDoc(docRef, item);
+      }
+      const seededSnap = await getDocs(colRef);
+      return seededSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    }
+
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
@@ -20,7 +35,15 @@ const getCachedContent = unstable_cache(
 
 export async function GET(req: Request) {
   try {
-    const content = await getCachedContent();
+    const { searchParams } = new URL(req.url);
+    const pageFilter = searchParams.get("page");
+
+    let content = await getCachedContent();
+
+    if (pageFilter) {
+      content = content.filter((item: any) => item.page === pageFilter || item.page === "global");
+    }
+
     return NextResponse.json(content, {
       headers: {
         "Cache-Control": "no-store, max-age=0, must-revalidate"

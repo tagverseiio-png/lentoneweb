@@ -3,36 +3,30 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { unstable_cache, revalidateTag } from "next/cache";
+
 
 import { productsData } from "@/data/products";
 
-const getCachedProducts = unstable_cache(
-  async () => {
+export async function GET() {
+  try {
     const colRef = collection(db, "products");
     const snapshot = await getDocs(colRef);
 
+    let products;
     if (snapshot.empty) {
       for (const prod of productsData) {
         const docRef = doc(db, "products", prod.id);
         await setDoc(docRef, prod);
       }
       const seededSnap = await getDocs(colRef);
-      return seededSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      products = seededSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } else {
+      products = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
     }
 
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-  },
-  ["products-list"],
-  { revalidate: 3600, tags: ["products"] }
-);
-
-export async function GET() {
-  try {
-    const products = await getCachedProducts();
     return NextResponse.json(products, {
       headers: {
         "Cache-Control": "no-store, max-age=0, must-revalidate"
@@ -80,8 +74,7 @@ export async function POST(req: Request) {
     const docRef = doc(db, "products", docId);
     await setDoc(docRef, productData);
 
-    // Invalidate products cache
-    revalidateTag("products", "max");
+
 
     return NextResponse.json(productData);
   } catch (error: any) {
@@ -133,8 +126,7 @@ export async function PUT(req: Request) {
 
     await setDoc(docRef, updatedData, { merge: true });
     
-    // Invalidate products cache
-    revalidateTag("products", "max");
+
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
@@ -155,8 +147,7 @@ export async function DELETE(req: Request) {
     const docRef = doc(db, "products", id);
     await deleteDoc(docRef);
     
-    // Invalidate products cache
-    revalidateTag("products", "max");
+
 
     return NextResponse.json({ success: true, id });
   } catch (error) {

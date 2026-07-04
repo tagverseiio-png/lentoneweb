@@ -79,7 +79,7 @@ export default function About() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" alt="Lentone Laboratory" />
+              <img src={content.about_image || "/backup_images/luxury-floor-cleaner.png"} alt="Lentone Laboratory" />
             </motion.div>
           </div>
         </div>
