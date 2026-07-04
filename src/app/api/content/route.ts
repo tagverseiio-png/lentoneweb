@@ -3,42 +3,44 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { unstable_cache, revalidateTag } from "next/cache";
-
 import { defaultPageContent } from "@/data/defaultPageContent";
 
-const getCachedContent = unstable_cache(
-  async () => {
-    const colRef = collection(db, "pageContent");
-    const snapshot = await getDocs(colRef);
+let cachedContent: any[] | null = null;
 
-    if (snapshot.empty) {
-      for (const item of defaultPageContent) {
-        const docRef = doc(db, "pageContent", item.id);
-        await setDoc(docRef, item);
-      }
-      const seededSnap = await getDocs(colRef);
-      return seededSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+async function fetchContentData() {
+  if (cachedContent && cachedContent.length > 0) {
+    return cachedContent;
+  }
+
+  const colRef = collection(db, "pageContent");
+  const snapshot = await getDocs(colRef);
+
+  if (snapshot.empty) {
+    for (const item of defaultPageContent) {
+      const docRef = doc(db, "pageContent", item.id);
+      await setDoc(docRef, item);
     }
-
-    return snapshot.docs.map(doc => ({
+    const seededSnap = await getDocs(colRef);
+    cachedContent = seededSnap.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
-  },
-  ["page-content-list"],
-  { revalidate: 3600, tags: ["content"] }
-);
+  } else {
+    cachedContent = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  }
+
+  return cachedContent;
+}
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const pageFilter = searchParams.get("page");
 
-    let content = await getCachedContent();
+    let content = await fetchContentData();
 
     if (pageFilter) {
       content = content.filter((item: any) => item.page === pageFilter || item.page === "global");
@@ -81,8 +83,7 @@ export async function PUT(req: Request) {
 
     await setDoc(docRef, updatedData, { merge: true });
 
-    // Invalidate content cache
-    revalidateTag("content", "max");
+    cachedContent = null;
 
     return NextResponse.json({ id: docId, ...updatedData });
   } catch (error) {
@@ -99,15 +100,14 @@ export async function DELETE(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id"); // e.g. "home_hero_title"
+    const id = searchParams.get("id");
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
     await deleteDoc(doc(db, "pageContent", id));
 
-    // Invalidate content cache
-    revalidateTag("content", "max");
+    cachedContent = null;
 
     return NextResponse.json({ success: true });
   } catch (error) {

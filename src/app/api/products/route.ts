@@ -7,8 +7,18 @@ import { authOptions } from "@/lib/auth";
 
 import { productsData } from "@/data/products";
 
+let cachedProducts: any[] | null = null;
+
 export async function GET() {
   try {
+    if (cachedProducts && cachedProducts.length > 0) {
+      return NextResponse.json(cachedProducts, {
+        headers: {
+          "Cache-Control": "no-store, max-age=0, must-revalidate"
+        }
+      });
+    }
+
     const colRef = collection(db, "products");
     const snapshot = await getDocs(colRef);
 
@@ -26,6 +36,8 @@ export async function GET() {
         ...doc.data()
       }));
     }
+
+    cachedProducts = products;
 
     return NextResponse.json(products, {
       headers: {
@@ -74,7 +86,7 @@ export async function POST(req: Request) {
     const docRef = doc(db, "products", docId);
     await setDoc(docRef, productData);
 
-
+    cachedProducts = null;
 
     return NextResponse.json(productData);
   } catch (error: any) {
@@ -126,7 +138,7 @@ export async function PUT(req: Request) {
 
     await setDoc(docRef, updatedData, { merge: true });
     
-
+    cachedProducts = null;
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
@@ -147,7 +159,7 @@ export async function DELETE(req: Request) {
     const docRef = doc(db, "products", id);
     await deleteDoc(docRef);
     
-
+    cachedProducts = null;
 
     return NextResponse.json({ success: true, id });
   } catch (error) {

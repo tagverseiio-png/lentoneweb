@@ -23,27 +23,23 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch content
-    fetch("/api/content?page=home")
-      .then(res => res.json())
-      .then(data => {
-        const contentMap: Record<string, string> = {};
-        data.forEach((item: any) => {
-          contentMap[item.section] = item.content;
-        });
-        setContent(contentMap);
-      })
-      .catch(() => {});
-
-    // Fetch products
-    fetch("/api/products")
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setFeaturedProducts(data.slice(0, 3));
+    Promise.all([
+      fetch("/api/content?page=home").then(res => res.json()),
+      fetch("/api/products").then(res => res.json())
+    ])
+      .then(([contentData, productsData]) => {
+        if (Array.isArray(contentData)) {
+          const contentMap: Record<string, string> = {};
+          contentData.forEach((item: any) => {
+            contentMap[item.section] = item.content;
+          });
+          setContent(contentMap);
+        }
+        if (Array.isArray(productsData)) {
+          setFeaturedProducts(productsData.slice(0, 3));
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error("Error loading home data:", err));
   }, []);
 
   return (
