@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { unstable_cache, revalidateTag } from "next/cache";
 
 const getCachedContent = unstable_cache(
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
     const content = await getCachedContent();
     return NextResponse.json(content, {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600"
+        "Cache-Control": "no-store, max-age=0, must-revalidate"
       }
     });
   } catch (error) {
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -69,7 +70,7 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

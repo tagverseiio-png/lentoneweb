@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { unstable_cache, revalidateTag } from "next/cache";
 
 const getCachedSEOList = unstable_cache(
@@ -52,7 +53,7 @@ export async function GET(req: Request) {
         keywords: "hospitality, amenities, cleaning solutions, floor cleaner, hand wash, hotel supply"
       }, {
         headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600"
+          "Cache-Control": "no-store, max-age=0, must-revalidate"
         }
       });
     }
@@ -71,7 +72,7 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

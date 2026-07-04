@@ -24,7 +24,7 @@ export default function SeoEditor() {
   const fetchSeo = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/seo");
+      const res = await fetch(`/api/seo?t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (Array.isArray(data)) {
         setSeoList(data);

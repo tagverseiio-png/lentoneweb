@@ -31,7 +31,7 @@ export default function ContentManager() {
 
   const fetchContent = () => {
     setIsLoading(true);
-    fetch("/api/content")
+    fetch(`/api/content?t=${Date.now()}`, { cache: "no-store" })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

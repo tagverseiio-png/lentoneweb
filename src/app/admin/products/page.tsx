@@ -35,7 +35,7 @@ export default function ProductManager() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (Array.isArray(data)) {
         setProducts(data);

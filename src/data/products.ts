@@ -19,7 +19,7 @@ export const productsData = [
       "Shelf Life": "24 Months",
       "Application": "Floor Mopping / Auto Scrubbers"
     },
-    image: "https://images.unsplash.com/photo-1584820927498-cafe8c106093?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/luxury-floor-cleaner.png"
   },
   {
     id: "dishwash-gel",
@@ -41,7 +41,7 @@ export const productsData = [
       "Shelf Life": "24 Months",
       "Application": "Manual Dishwashing"
     },
-    image: "https://images.unsplash.com/photo-1585659722983-38ca8e89f664?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/dishwash-gel.jpg"
   },
   {
     id: "premium-hand-wash",
@@ -63,7 +63,7 @@ export const productsData = [
       "Shelf Life": "36 Months",
       "Application": "Hand Cleansing"
     },
-    image: "https://images.unsplash.com/photo-1616400619175-5beda3a17896?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/premium-hand-wash.jpg"
   },
   {
     id: "dining-disinfectant",
@@ -85,7 +85,7 @@ export const productsData = [
       "Shelf Life": "24 Months",
       "Application": "Surface Disinfection"
     },
-    image: "https://images.unsplash.com/photo-1595188846175-c08170c91bd7?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/dining-disinfectant.jpg"
   },
   {
     id: "car-wash-shampoo",
@@ -107,7 +107,7 @@ export const productsData = [
       "Shelf Life": "24 Months",
       "Application": "Automotive Cleaning"
     },
-    image: "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/car-wash-shampoo.jpg"
   },
   {
     id: "premium-toilet-cleaner",
@@ -129,7 +129,7 @@ export const productsData = [
       "Shelf Life": "24 Months",
       "Application": "Toilet Bowl Cleaning"
     },
-    image: "https://images.unsplash.com/photo-1584820926521-127e38a2e2d5?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/premium-toilet-cleaner.jpg"
   },
   {
     id: "platinum-plus-phenyl",
@@ -151,7 +151,7 @@ export const productsData = [
       "Shelf Life": "24 Months",
       "Application": "General Floor Disinfection"
     },
-    image: "https://images.unsplash.com/photo-1595188846175-c08170c91bd7?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/platinum-plus-phenyl.jpg"
   },
   {
     id: "hotel-toothbrush",
@@ -173,7 +173,7 @@ export const productsData = [
       "Packaging": "Box/Sachet wrap",
       "Application": "Guest Amenities"
     },
-    image: "https://images.unsplash.com/photo-1559868723-5e9a4f475143?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/hotel-toothbrush.jpg"
   },
   {
     id: "hotel-toothpaste",
@@ -195,6 +195,6 @@ export const productsData = [
       "Shelf Life": "36 Months",
       "Application": "Guest Amenities"
     },
-    image: "https://images.unsplash.com/photo-1559868723-5e9a4f475143?auto=format&fit=crop&w=1000&q=80"
+    image: "/backup_images/hotel-toothpaste.jpg"
   }
 ];

@@ -3,11 +3,16 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { unstable_cache } from "next/cache";
 
+import { productsData } from "@/data/products";
+
 const getCachedSingleProduct = unstable_cache(
   async (id: string) => {
     const docRef = doc(db, "products", id);
     const docSnap = await getDoc(docRef);
-    if (!docSnap.exists()) return null;
+    if (!docSnap.exists()) {
+      const local = productsData.find(p => p.id === id);
+      return local || null;
+    }
     return { id: docSnap.id, ...docSnap.data() };
   },
   ["product-detail"],
@@ -28,7 +33,7 @@ export async function GET(
 
     return NextResponse.json(product, {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600"
+        "Cache-Control": "no-store, max-age=0, must-revalidate"
       }
     });
   } catch (error) {

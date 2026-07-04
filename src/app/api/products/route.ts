@@ -1,13 +1,26 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { unstable_cache, revalidateTag } from "next/cache";
+
+import { productsData } from "@/data/products";
 
 const getCachedProducts = unstable_cache(
   async () => {
     const colRef = collection(db, "products");
     const snapshot = await getDocs(colRef);
+
+    if (snapshot.empty) {
+      for (const prod of productsData) {
+        const docRef = doc(db, "products", prod.id);
+        await setDoc(docRef, prod);
+      }
+      const seededSnap = await getDocs(colRef);
+      return seededSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
@@ -22,7 +35,7 @@ export async function GET() {
     const products = await getCachedProducts();
     return NextResponse.json(products, {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600"
+        "Cache-Control": "no-store, max-age=0, must-revalidate"
       }
     });
   } catch (error: any) {
@@ -33,7 +46,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await req.json();
@@ -79,7 +92,7 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await req.json();
@@ -118,7 +131,7 @@ export async function PUT(req: Request) {
     if (data.specs !== undefined) updatedData.specs = data.specs;
     updatedData.updatedAt = new Date().toISOString();
 
-    await updateDoc(docRef, updatedData);
+    await setDoc(docRef, updatedData, { merge: true });
     
     // Invalidate products cache
     revalidateTag("products", "max");
@@ -132,7 +145,7 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
