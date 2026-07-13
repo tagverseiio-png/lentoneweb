@@ -48,8 +48,12 @@ export const defaultPageContent: DefaultContentItem[] = [
   { id: "about_qa_item4", page: "about", section: "qa_item4", label: "QA Item 4", type: "text", content: "Hygienic Production" },
   { id: "about_presence_title", page: "about", section: "presence_title", label: "Presence Section Title", type: "text", content: "Our Presence" },
   { id: "about_presence_desc", page: "about", section: "presence_desc", label: "Presence Section Description", type: "textarea", content: "Strategically located to serve our clients efficiently across the region." },
-  { id: "about_presence_head_office", page: "about", section: "presence_head_office", label: "Head Office Location", type: "text", content: "Chennai, Tamil Nadu" },
-  { id: "about_presence_branch_office", page: "about", section: "presence_branch_office", label: "Branch Office Location", type: "text", content: "Kannur, Kerala" },
+  { id: "about_presence_head_office", page: "about", section: "presence_head_office", label: "Head Office Title/Location", type: "text", content: "Chennai, Tamil Nadu" },
+  { id: "about_presence_ho_address", page: "about", section: "presence_ho_address", label: "Head Office Full Address", type: "textarea", content: "First floor, Tamil Residency layout, plot no.47, Hindustan college road, Padur, Kalipattur, Tamil Nadu 603103" },
+  { id: "about_presence_ho_image", page: "about", section: "presence_ho_image", label: "Head Office Image", type: "image", content: "" },
+  { id: "about_presence_branch_office", page: "about", section: "presence_branch_office", label: "Branch Office Title/Location", type: "text", content: "Kannur, Kerala" },
+  { id: "about_presence_bo_address", page: "about", section: "presence_bo_address", label: "Branch Office Full Address", type: "textarea", content: "Kannur, Kerala office full address goes here." },
+  { id: "about_presence_bo_image", page: "about", section: "presence_bo_image", label: "Branch Office Image", type: "image", content: "" },
 
   // PRIVATE LABEL (OEM)
   { id: "private-label_pl_title", page: "private-label", section: "pl_title", label: "Hero Title", type: "text", content: "Private Label & OEM Manufacturing" },

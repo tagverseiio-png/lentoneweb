@@ -129,9 +129,17 @@ export default function About() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <Building2 size={40} className="text-gold" />
-              <h3>Head Office</h3>
-              <p>{content.presence_head_office || "Chennai, Tamil Nadu"}</p>
+              {content.presence_ho_image && (
+                <img src={content.presence_ho_image} alt="Head Office" className={styles.locationImage} />
+              )}
+              <div className={styles.locationCardContent}>
+                <Building2 size={40} className="text-gold" />
+                <h3>Head Office</h3>
+                <p style={{ fontWeight: 600, color: "var(--white)", marginBottom: "10px" }}>{content.presence_head_office || "Chennai, Tamil Nadu"}</p>
+                {content.presence_ho_address && (
+                  <p style={{ fontSize: "0.9rem", color: "#B0BAC9" }}>{content.presence_ho_address}</p>
+                )}
+              </div>
             </motion.div>
             <motion.div 
               className={styles.locationCard}
@@ -140,9 +148,17 @@ export default function About() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <MapPin size={40} className="text-gold" />
-              <h3>Branch Office</h3>
-              <p>{content.presence_branch_office || "Kannur, Kerala"}</p>
+              {content.presence_bo_image && (
+                <img src={content.presence_bo_image} alt="Branch Office" className={styles.locationImage} />
+              )}
+              <div className={styles.locationCardContent}>
+                <MapPin size={40} className="text-gold" />
+                <h3>Branch Office</h3>
+                <p style={{ fontWeight: 600, color: "var(--white)", marginBottom: "10px" }}>{content.presence_branch_office || "Kannur, Kerala"}</p>
+                {content.presence_bo_address && (
+                  <p style={{ fontSize: "0.9rem", color: "#B0BAC9" }}>{content.presence_bo_address}</p>
+                )}
+              </div>
             </motion.div>
           </div>
         </div>
