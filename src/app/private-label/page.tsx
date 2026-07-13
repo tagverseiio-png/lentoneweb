@@ -57,12 +57,12 @@ export default function PrivateLabelPage() {
   };
 
   const processSteps = [
-    { icon: <Target size={32} />, title: "1. Requirement Brief", desc: "Share your vision, target market, and product specifications." },
-    { icon: <FlaskConical size={32} />, title: "2. Formula Development", desc: "Our R&D team develops custom formulations tailored to your brand." },
-    { icon: <CheckCircle size={32} />, title: "3. Sample Approval", desc: "Test the prototypes. We refine until you are 100% satisfied." },
-    { icon: <PenTool size={32} />, title: "4. Packaging & Design", desc: "Select premium bottles and custom labels featuring your logo." },
-    { icon: <Package size={32} />, title: "5. Mass Production", desc: "We manufacture, fill, and pack under strict quality control." },
-    { icon: <Truck size={32} />, title: "6. Dispatch & Delivery", desc: "Your fully branded ready-to-sell products delivered to you." },
+    { icon: <Target size={32} />, title: content.step1_title || "1. Requirement Brief", desc: content.step1_desc || "Share your vision, target market, and product specifications." },
+    { icon: <FlaskConical size={32} />, title: content.step2_title || "2. Formula Development", desc: content.step2_desc || "Our R&D team develops custom formulations tailored to your brand." },
+    { icon: <CheckCircle size={32} />, title: content.step3_title || "3. Sample Approval", desc: content.step3_desc || "Test the prototypes. We refine until you are 100% satisfied." },
+    { icon: <PenTool size={32} />, title: content.step4_title || "4. Packaging & Design", desc: content.step4_desc || "Select premium bottles and custom labels featuring your logo." },
+    { icon: <Package size={32} />, title: content.step5_title || "5. Mass Production", desc: content.step5_desc || "We manufacture, fill, and pack under strict quality control." },
+    { icon: <Truck size={32} />, title: content.step6_title || "6. Dispatch & Delivery", desc: content.step6_desc || "Your fully branded ready-to-sell products delivered to you." },
   ];
 
   return (
@@ -90,9 +90,9 @@ export default function PrivateLabelPage() {
         <div className="container">
           
           <div style={{ textAlign: "center", marginBottom: "50px" }}>
-            <h2 style={{ color: "var(--navy)", marginBottom: "16px" }}>The OEM Process</h2>
+            <h2 style={{ color: "var(--navy)", marginBottom: "16px" }}>{content.process_title || "The OEM Process"}</h2>
             <p style={{ color: "var(--text-secondary)", maxWidth: "700px", margin: "0 auto" }}>
-              We offer end-to-end private labeling services. From custom formulation and fragrance selection to bottle design and labeling.
+              {content.process_desc || "We offer end-to-end private labeling services. From custom formulation and fragrance selection to bottle design and labeling."}
             </p>
           </div>
 
@@ -133,7 +133,7 @@ export default function PrivateLabelPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 style={{ textAlign: "center", marginBottom: "30px", color: "var(--navy)" }}>OEM Enquiry</h2>
+            <h2 style={{ textAlign: "center", marginBottom: "30px", color: "var(--navy)" }}>{content.form_title || "OEM Enquiry"}</h2>
             
             {submitted ? (
               <div className={styles.successMessage}>

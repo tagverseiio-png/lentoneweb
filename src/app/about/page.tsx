@@ -88,16 +88,16 @@ export default function About() {
       <section className={`${styles.contentSection} section-bg-grey`}>
         <div className="container">
           <div className="text-center" style={{ maxWidth: '700px', margin: '0 auto' }}>
-            <h2>Quality Assurance</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>We adhere to strict international manufacturing standards to guarantee the safety and efficacy of our products.</p>
+            <h2>{content.qa_title || "Quality Assurance"}</h2>
+            <p style={{ color: 'var(--text-secondary)' }}>{content.qa_desc || "We adhere to strict international manufacturing standards to guarantee the safety and efficacy of our products."}</p>
           </div>
 
           <div className={styles.qualityGrid}>
             {[
-              { icon: <Beaker size={36} />, title: "Premium Raw Materials" },
-              { icon: <ShieldCheck size={36} />, title: "Laboratory Testing" },
-              { icon: <CheckCircle size={36} />, title: "Quality Inspection" },
-              { icon: <Factory size={36} />, title: "Hygienic Production" }
+              { icon: <Beaker size={36} />, title: content.qa_item1 || "Premium Raw Materials" },
+              { icon: <ShieldCheck size={36} />, title: content.qa_item2 || "Laboratory Testing" },
+              { icon: <CheckCircle size={36} />, title: content.qa_item3 || "Quality Inspection" },
+              { icon: <Factory size={36} />, title: content.qa_item4 || "Hygienic Production" }
             ].map((item, i) => (
               <motion.div 
                 className={styles.qualityCard} 
@@ -118,8 +118,8 @@ export default function About() {
       <section className={styles.contentSection}>
         <div className="container">
           <div className="text-center" style={{ maxWidth: '700px', margin: '0 auto 50px' }}>
-            <h2>Our Presence</h2>
-            <p style={{ color: 'var(--text-secondary)' }}>Strategically located to serve our clients efficiently across the region.</p>
+            <h2>{content.presence_title || "Our Presence"}</h2>
+            <p style={{ color: 'var(--text-secondary)' }}>{content.presence_desc || "Strategically located to serve our clients efficiently across the region."}</p>
           </div>
 
           <div className={styles.presenceGrid}>

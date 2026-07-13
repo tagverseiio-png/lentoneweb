@@ -15,23 +15,25 @@ async function fetchContentData() {
   const colRef = collection(db, "pageContent");
   const snapshot = await getDocs(colRef);
 
-  if (snapshot.empty) {
-    for (const item of defaultPageContent) {
+  let fetchedData = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  // Seed missing items from defaultPageContent
+  const missingItems = defaultPageContent.filter(
+    defaultItem => !fetchedData.some((item: any) => item.id === defaultItem.id)
+  );
+
+  if (missingItems.length > 0) {
+    for (const item of missingItems) {
       const docRef = doc(db, "pageContent", item.id);
       await setDoc(docRef, item);
+      fetchedData.push(item);
     }
-    const seededSnap = await getDocs(colRef);
-    cachedContent = seededSnap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-  } else {
-    cachedContent = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
   }
 
+  cachedContent = fetchedData;
   return cachedContent;
 }
 
