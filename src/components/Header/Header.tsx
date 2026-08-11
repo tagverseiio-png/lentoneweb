@@ -11,7 +11,7 @@ import styles from "./Header.module.css";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [logoSrc, setLogoSrc] = useState("");
+  const [logoSrc, setLogoSrc] = useState("/logo.png");
   const pathname = usePathname();
 
   useEffect(() => {
@@ -47,8 +47,8 @@ export default function Header() {
     <header className={`${styles.header} ${isScrolled ? styles.scrolled : ""}`}>
       <div className={`container ${styles.headerContainer}`}>
         <Link href="/" className={styles.logo}>
-          {logoSrc && logoSrc !== "/logo.png" ? (
-            <img src={logoSrc} alt="Lentone Logo" style={{ objectFit: "contain", width: "auto", height: "48px" }} />
+          {logoSrc ? (
+            <Image src={logoSrc} alt="Lentone Logo" width={150} height={48} style={{ objectFit: "contain", width: "auto", height: "48px" }} />
           ) : (
             <span style={{ fontSize: "24px", fontWeight: "700", color: isScrolled ? "var(--navy)" : "var(--white)", letterSpacing: "0.05em", fontFamily: "var(--font-playfair)" }}>
               LENTONE

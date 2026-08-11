@@ -6,7 +6,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
-  const [logoSrc, setLogoSrc] = useState("");
+  const [logoSrc, setLogoSrc] = useState("/logo.png");
 
   useEffect(() => {
     fetch("/api/content?page=global")
@@ -29,7 +29,7 @@ export default function Footer() {
         {/* About Section */}
         <div className={styles.footerCol}>
           <Link href="/" className={styles.footerLogo}>
-            {logoSrc && logoSrc !== "/logo.png" ? (
+            {logoSrc ? (
               <img src={logoSrc} alt="Lentone Logo" style={{ objectFit: "contain", height: "64px", width: "auto" }} />
             ) : (
               <span style={{ fontSize: "28px", fontWeight: "700", color: "var(--gold)", letterSpacing: "0.05em", fontFamily: "var(--font-playfair)" }}>
