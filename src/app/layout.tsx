@@ -53,13 +53,15 @@ const getCachedSEOHome = unstable_cache(
 export async function generateMetadata(): Promise<Metadata> {
   let title = "LENTONE | Premium Hospitality & Cleaning Solutions";
   let favicon = "/favicon.ico";
-  let description = "Indian manufacturer of premium-quality hospitality amenities and cleaning solutions serving hotels, restaurants, offices, and commercial businesses.";
-  let keywords = "";
+  let description =
+    "Indian manufacturer of premium-quality hospitality amenities and cleaning solutions serving hotels, restaurants, offices, and commercial businesses.";
+  let keywords =
+    "hospitality amenities, commercial cleaning products, hotel supplies, private label manufacturer India";
 
   try {
     const titleData = await getCachedGlobalTabTitle();
-    if (titleData) {
-      title = titleData.content || title;
+    if (titleData && titleData.content) {
+      title = titleData.content;
     } else {
       const seoData = await getCachedSEOHome();
       if (seoData) {
@@ -70,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 
     const faviconData = await getCachedGlobalFavicon();
-    if (faviconData && faviconData.content) {
+    if (faviconData && faviconData.content && !faviconData.content.startsWith("data:")) {
       favicon = faviconData.content;
     }
   } catch (error) {
@@ -78,15 +80,43 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   return {
+    metadataBase: new URL("https://www.lentone.in"),
     title,
     description,
     keywords,
     icons: {
-      icon: favicon,
-    }
+      icon: [
+        { url: favicon, sizes: "any" },
+        { url: "/icon-48x48.png", sizes: "48x48", type: "image/png" },
+        { url: "/icon-96x96.png", sizes: "96x96", type: "image/png" },
+        { url: "/icon-144x144.png", sizes: "144x144", type: "image/png" },
+        { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      ],
+      shortcut: favicon,
+      apple: [
+        { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      ],
+    },
+    openGraph: {
+      title,
+      description,
+      url: "https://www.lentone.in",
+      siteName: "LENTONE",
+      images: [
+        {
+          url: "/logo.png",
+          width: 500,
+          height: 500,
+          alt: "LENTONE Brand Logo",
+        },
+      ],
+      locale: "en_IN",
+      type: "website",
+    },
+    manifest: "/manifest.webmanifest",
   };
 }
-
 
 export default function RootLayout({
   children,
@@ -95,6 +125,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon-48x48.png" sizes="48x48" type="image/png" />
+        <link rel="icon" href="/icon-96x96.png" sizes="96x96" type="image/png" />
+        <link rel="icon" href="/icon-192x192.png" sizes="192x192" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" type="image/png" />
+      </head>
       <body className={`${playfair.variable} ${inter.variable}`}>
         <Header />
         <main style={{ minHeight: "calc(100vh - 400px)" }}>
